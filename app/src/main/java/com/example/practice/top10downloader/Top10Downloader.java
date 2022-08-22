@@ -5,9 +5,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 import com.example.practice.R;
-import com.example.practice.top10downloader.ParseApplications;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -19,15 +20,17 @@ import java.net.URL;
 
 public class Top10Downloader extends AppCompatActivity {
     private static final String TAG = "Top10Downloader";
+    private ListView listApps;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.top_10_downloader);
+        listApps = findViewById(R.id.xmlListView);
 
         Log.d(TAG, "onCreate: starting AsyncTask");
         DownloadData downloadData = new DownloadData();
-        downloadData.execute("http://ax.itunes.apple.com/WebObjects/MZStoreServices.woa/ws/RSS/topfreeapplications/limit=10/xml");
+        downloadData.execute("http://ax.itunes.apple.com/WebObjects/MZStoreServices.woa/ws/RSS/topfreeapplications/limit=25/xml");
         Log.d(TAG, "onCreate: done");
     }
 
@@ -40,7 +43,8 @@ public class Top10Downloader extends AppCompatActivity {
             Log.d(TAG, "onPostExecute: parameter is given");
             ParseApplications parseApplications = new ParseApplications();
             boolean status = parseApplications.parse(s);
-            Log.d(TAG, "onPostExecute: Status: " + status);
+            FeedAdapter feedAdapter = new FeedAdapter(Top10Downloader.this, R.layout.list_record, parseApplications.getApplications());
+            listApps.setAdapter(feedAdapter);
         }
 
         @Override
